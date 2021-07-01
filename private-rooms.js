@@ -85,7 +85,7 @@ module.exports = (client) => {
                 time_stamps.set(newVoiceState.member.user.id, current_time) //set cooldown for user
               }).catch(() => console.log(generateTimeLog()+`\u001b[31mVoice channel creation error\u001b[0m ${newVoiceState.member.user.tag}`))
         } else if (oldVoiceState.channel) { // The member disconnected from a channel.
-            if (oldVoiceState.channel != newVoiceState.channel) {if (!oldVoiceState.channel.members.size && oldVoiceState.channelID != config.create_rooms_channel_id) return oldVoiceState.channel.delete()} // if Empty -> delete channel
+            if (oldVoiceState.channel != newVoiceState.channel && oldVoiceState.channel.parentID == oldVoiceState.guild.channels.cache.find(channel => channel.id === config.create_rooms_channel_id).parentID) {if (!oldVoiceState.channel.members.size && oldVoiceState.channelID != config.create_rooms_channel_id) return oldVoiceState.channel.delete()} // if Empty -> delete channel
         }})
         }
 
