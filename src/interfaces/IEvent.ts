@@ -1,19 +1,20 @@
-import { ClientEvents } from "discord.js";
+import {ClientEvents, VoiceState} from "discord.js";
 
 type Run <K extends keyof ExtendedClientEvents> = (...args: ExtendedClientEvents[K]) => Promise<any>
 
 interface ExtendedClientEvents extends ClientEvents {
-    joinedVoice: [],
-    leavedVoice: [],
-    changedVoice: [],
-    mutedInVoice: [],
-    deafedInVoice: [],
-    unMutedInVoice: [],
-    unDeafedInVoice: []
+    joinedPrivateRoomCreation: [oldState: VoiceState, newState: VoiceState]
+    joinedVoice: [newState: VoiceState]
+    leavedVoice: [oldState: VoiceState]
+    changedVoice: [oldState: VoiceState, newState: VoiceState]
+    mutedInVoice: [oldState: VoiceState, newState: VoiceState]
+    deafedInVoice: [oldState: VoiceState, newState: VoiceState]
+    unMutedInVoice: [oldState: VoiceState, newState: VoiceState]
+    unDeafedInVoice: [oldState: VoiceState, newState: VoiceState]
 }
 
 export interface IEvent<K extends keyof ExtendedClientEvents> {
-    name: K;
-    once?: boolean;
-    run: Run<K>;
+    name: K
+    once?: boolean
+    run: Run<K>
 }

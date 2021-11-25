@@ -5,15 +5,26 @@ export type TGuildResponse = (Document<any, any, IGuild> & IGuild & {_id: Types.
 
 export class GuildService {
     public static async isCreatePrivateChannel(guildId: string, channelId: string): Promise<boolean> {
-        const channel = await GuildModel.findOne({guildId, createPrivateChannelId: channelId});
+        const resp = await GuildModel.findOne({guildId, createPrivateChannelId: channelId});
 
-        return !!channel;
+        return !!resp;
+    }
+
+    public static async getCreatePrivateChannelId(guildId: string): Promise<undefined | string> {
+        const resp = await GuildModel.findOne({guildId});
+
+        return resp?.createPrivateChannelId;
     }
 
     public static async isGuildPrefix(guildId: string, prefix: string): Promise<boolean> {
         const resp = await GuildModel.findOne({guildId, prefix});
 
         return !!resp;
+    }
+
+    public static async getCooldownTime(guildId: string) {
+        const resp = await GuildModel.findOne({guildId});
+        return resp?.cooldown;
     }
 
     public static async isGuildModerator(guildId: string, roleId: string): Promise<boolean> {
@@ -24,7 +35,7 @@ export class GuildService {
 
     public static async isPermanentlyMuted(guildId: string, userId: string) {
         const resp = await GuildModel.findOne({ guildId, 'permanentlyMuted.who': userId });
-        console.log(resp);
+
         return !!resp;
     }
 
@@ -32,5 +43,12 @@ export class GuildService {
         const resp = await GuildModel.findOne({ guildId, 'permanentlyDeafed.who': userId });
 
         return !!resp;
+    }
+
+    public static async addNewGuild(guildId: string, createPrivateChannelId: string) {
+        await GuildModel.create({
+            guildId,
+            createPrivateChannelId
+        })
     }
 }

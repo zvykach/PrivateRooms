@@ -4,7 +4,7 @@ import { IUser, UserSchemaInner } from '../interfaces/IUser';
 export interface IVoiceChannel {
     channelId: string
     //guild: Types.ObjectId
-    owner: string
+    ownerId: string
     mutedUsers: IUser[]
     deafedUsers: IUser[]
 }
@@ -12,7 +12,7 @@ export interface IVoiceChannel {
 const schema = new Schema<IVoiceChannel>({
     channelId: {type: String, required: true},
     //guild: { type: Types.ObjectId, ref: 'User' },
-    owner: {type: String, required: true },
+    ownerId: {type: String, required: true },
     mutedUsers: [{ type: UserSchemaInner, required: false}],
     deafedUsers: [{ type: UserSchemaInner, required: false}]
 });

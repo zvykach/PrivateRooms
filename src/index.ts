@@ -3,6 +3,7 @@ import { IEvent } from './interfaces/IEvent';
 import config from '../config'
 import mongoose from 'mongoose';
 import fs from 'fs';
+import {GuildService} from "@/services/guild.service";
 
 // import readline from 'readline';
 // const rl = readline.createInterface({
@@ -25,7 +26,11 @@ class PrivateRooms {
 
     private async loadEvents() {
         const importedL: IEvent<any>[] = [];
-        importedL.push((await import('./events/initMessage.event')).default);
+        importedL.push((await import('./events/sentInitMessage.event')).default);
+        importedL.push((await import('./events/joinedPrivateRoomCreation.event')).default);
+        importedL.push((await import('./events/joinVoice.event')).default);
+        importedL.push((await import('./events/leaveVoice.event')).default);
+        importedL.push((await import('./events/changedVoice.event')).default);
 
         for (const imported of importedL) {
             if (imported.once) this.client.once(imported.name, imported.run);
@@ -37,20 +42,28 @@ class PrivateRooms {
         this.client.on("voiceStateUpdate", (oldState: VoiceState, newState: VoiceState) => this.customVoiceState(oldState, newState))
     }
 
-    private customVoiceState(oldState: VoiceState, newState: VoiceState) {
+    private async customVoiceState(oldState: VoiceState, newState: VoiceState) {
+        // Joined "CreatePrivateRoom" channel
+        if (newState.channelId && newState.channelId != oldState.channelId && await GuildService.isCreatePrivateChannel(newState.guild.id, newState.channelId)) {
+            this.client.emit("joinedPrivateRoomCreation", oldState, newState);
+            console.log("joinedPrivateRoomCreation");
+            return;
+        }
         // JoinedVoice
         if (!oldState.channel && newState.channel) {
-            this.client.emit("joinedVoice");
+            this.client.emit("joinedVoice", newState);
             console.log("Joined");
             return;
         }
         // LeavedVoice
         if (oldState.channel && !newState.channel) {
+            this.client.emit("leavedVoice", oldState);
             console.log("Leaved");
             return;
         }
         // ChangedVoice
         if (oldState.channel !== newState.channel) {
+            this.client.emit("changedVoice", oldState, newState);
             console.log("Changed");
             return;
         }

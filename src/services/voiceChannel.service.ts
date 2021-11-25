@@ -9,7 +9,7 @@ export class VoiceChannelService {
     }
 
     public static async isChannelOwner(channelId: string, userId: string): Promise<boolean> {
-        return !! await VoiceChannelModel.findOne({ channelId, owner: userId });
+        return !! await VoiceChannelModel.findOne({ channelId, ownerId: userId });
     }
 
     public static async isMutedInChannel(channelId: string, userId: string): Promise<boolean> {
@@ -18,5 +18,16 @@ export class VoiceChannelService {
 
     public static async isDeafedInChannel(channelId: string, userId: string): Promise<boolean> {
         return !! await VoiceChannelModel.findOne({ channelId, 'deafedUsers.who': userId });
+    }
+
+    public static async addNewChannel(channelId: string, ownerId: string) {
+        await VoiceChannelModel.create({
+            channelId,
+            ownerId
+        })
+    }
+
+    public static async deleteChannel(channelId: string) {
+        await VoiceChannelModel.findOneAndDelete({ channelId });
     }
 }
