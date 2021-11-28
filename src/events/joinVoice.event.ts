@@ -5,7 +5,7 @@ import { checkUserDeafAndMute } from "@/utils/check.utils";
 const event: IEvent<"joinedVoice"> = {
     name: "joinedVoice",
     run: async (newState: VoiceState) => {
-        checkUserDeafAndMute(newState);
+        await checkUserDeafAndMute(newState);
     }
 }
 

@@ -5,7 +5,7 @@ import { checkIfChannelEmptyAndDelete } from "@/utils/check.utils";
 const event: IEvent<"leavedVoice"> = {
     name: "leavedVoice",
     run: async (oldState: VoiceState) => {
-        checkIfChannelEmptyAndDelete(oldState);
+        await checkIfChannelEmptyAndDelete(oldState);
     }
 }
 

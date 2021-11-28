@@ -1,8 +1,8 @@
 export interface IUser {
     who: string
     by: string
-    reason: string
-    time: number
+    reason?: string
+    time?: number
 }
 
 export const UserSchemaInner = {

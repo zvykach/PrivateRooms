@@ -7,17 +7,17 @@ export async function checkUserDeafAndMute(newState: VoiceState) {
     const permDeaf = await GuildService.isPermanentlyDeafed(newState.guild.id, newState.id);
 
     if (permMute || await VoiceChannelService.isMutedInChannel(newState.channelId!, newState.id)) {
-        newState.setMute(true);
+        await newState.setMute(true);
     }
     else {
-        newState.setMute(false);
+        await newState.setMute(false);
     }
 
     if (permDeaf || await VoiceChannelService.isDeafedInChannel(newState.channelId!, newState.id)) {
-        newState.setDeaf(true);
+        await newState.setDeaf(true);
     }
     else {
-        newState.setDeaf(false);
+        await newState.setDeaf(false);
     }
 }
 

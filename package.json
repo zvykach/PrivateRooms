@@ -5,9 +5,10 @@
   "main": "lib/index.js",
   "types": "lib",
   "scripts": {
-    "start": "nodemon --config nodemon.json --ext ts --ignore 'src/config/*.json' -r tsconfig-paths/register src/main.ts",
+    "start": "nodemon --config nodemon.json --ext ts --ignore 'src/config/*.json' -r tsconfig-paths/register ./main.ts",
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-    "bundle": "esbuild src/main.ts --bundle --platform=node --target=node16.7 --outfile=bundle/out.js --external:discord.js --external:level-ts"
+    "bundle": "esbuild src/index.ts --bundle --platform=node --target=node16.7 --outfile=bundle/out.js --external:discord.js --external:mongoose",
+    "debug": "node --inspect -r ts-node/register -r tsconfig-paths/register ./main.ts"
   },
   "author": "zvykach",
   "license": "GPL-3.0-or-later",
@@ -28,6 +29,7 @@
   "homepage": "https://github.com/zvykach/PrivateRooms#readme",
   "dependencies": {
     "discord.js": "^13.3.1",
+    "esbuild": "^0.14.0",
     "moment": "^2.29.1",
     "mongoose": "^6.0.13",
     "nodemon": "^2.0.15"

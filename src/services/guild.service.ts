@@ -5,9 +5,7 @@ export type TGuildResponse = (Document<any, any, IGuild> & IGuild & {_id: Types.
 
 export class GuildService {
     public static async isCreatePrivateChannel(guildId: string, channelId: string): Promise<boolean> {
-        const resp = await GuildModel.findOne({guildId, createPrivateChannelId: channelId});
-
-        return !!resp;
+        return !! await GuildModel.findOne({guildId, createPrivateChannelId: channelId});
     }
 
     public static async getCreatePrivateChannelId(guildId: string): Promise<undefined | string> {
@@ -50,5 +48,9 @@ export class GuildService {
             guildId,
             createPrivateChannelId
         })
+    }
+
+    public static async guildExits(guildId: string) {
+        return !! await GuildModel.findOne({guildId});
     }
 }

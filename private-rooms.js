@@ -113,6 +113,7 @@ function generateTimeLog() {
     let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds()
     return `${date} ${time} >> `
 }
+
 function ifActionNotByAdmin(newVoiceState,callback) {
     newVoiceState.guild.fetchAuditLogs({type:24,limit:1,user:newVoiceState})
             .then(audit => {

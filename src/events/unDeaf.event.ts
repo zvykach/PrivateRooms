@@ -5,11 +5,11 @@ import {VoiceState} from "discord.js";
 import {VoiceChannelModel} from "@/models/voiceChannel.model";
 import {IUser} from "@/interfaces/IUser";
 
-const event: IEvent<"unMutedInVoice"> = {
-    name: "unMutedInVoice",
+const event: IEvent<"unDeafedInVoice"> = {
+    name: "unDeafedInVoice",
     run: async (oldState: VoiceState, newState: VoiceState) => {
-        if (await GuildService.isPermanentlyMuted(newState.guild.id, newState.id)) {
-            await newState.setMute(true);
+        if (await GuildService.isPermanentlyDeafed(newState.guild.id, newState.id)) {
+            await newState.setDeaf(true);
             return;
         }
 
@@ -24,13 +24,13 @@ const event: IEvent<"unMutedInVoice"> = {
             return;
         }
 
-        const isMute = entry.changes?.find(change => change.key === 'mute' && change.new === false);
+        const isDeaf = entry.changes?.find(change => change.key === 'deaf' && change.new === false);
 
-        if (!isMute) {
+        if (!isDeaf) {
             return;
         }
 
-        await VoiceChannelModel.findOneAndUpdate({channelId: newState.channelId!},{$pull: {mutedUsers: {who: newState.id}}});
+        await VoiceChannelModel.findOneAndUpdate({channelId: newState.channelId!},{$pull: {deafedUsers: {who: newState.id}}});
     }
 }
 

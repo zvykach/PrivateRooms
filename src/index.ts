@@ -31,6 +31,10 @@ class PrivateRooms {
         importedL.push((await import('./events/joinVoice.event')).default);
         importedL.push((await import('./events/leaveVoice.event')).default);
         importedL.push((await import('./events/changedVoice.event')).default);
+        importedL.push((await import('./events/mute.event')).default);
+        importedL.push((await import('./events/unMute.event')).default);
+        importedL.push((await import('./events/deaf.event')).default);
+        importedL.push((await import('./events/unDeaf.event')).default);
 
         for (const imported of importedL) {
             if (imported.once) this.client.once(imported.name, imported.run);
@@ -69,21 +73,25 @@ class PrivateRooms {
         }
         // MutedInVoice
         if (!oldState.serverMute && newState.serverMute) {
+            this.client.emit("mutedInVoice", oldState, newState);
             console.log("Muted");
             return;
         }
         // UnMutedInVoice
         if (oldState.serverMute && !newState.serverMute) {
+            this.client.emit("unMutedInVoice", oldState, newState);
             console.log("UnMuted");
             return;
         }
         // DeafedInVoice
         if (!oldState.serverDeaf && newState.serverDeaf) {
+            this.client.emit("deafedInVoice", oldState, newState);
             console.log("Deafed");
             return;
         }
         // UndeafedInVoice
         if (oldState.serverDeaf && !newState.serverDeaf) {
+            this.client.emit("unDeafedInVoice", oldState, newState);
             console.log("unDeafed");
             return;
         }

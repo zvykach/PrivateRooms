@@ -2,7 +2,6 @@ import {IEvent} from '../interfaces/IEvent'
 import {Permissions, VoiceState} from 'discord.js'
 import {GuildService} from "@/services/guild.service";
 import {channelCreationError, cooldownTime} from "@/utils/embeds.util";
-import {ChannelTypes} from "discord.js/typings/enums";
 import {VoiceChannelService} from "@/services/voiceChannel.service";
 import {checkIfChannelEmptyAndDelete} from "@/utils/check.utils";
 
@@ -53,7 +52,7 @@ const event: IEvent<"joinedPrivateRoomCreation"> = {
             ?? 'Someone';
 
         const channel = await newState.guild.channels.create(name+'\'s channel', {
-            type: ChannelTypes.GUILD_VOICE,
+            type: 'GUILD_VOICE',
             parent: parentId,
             permissionOverwrites: [
                 {
