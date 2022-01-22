@@ -22,15 +22,19 @@ export async function checkUserDeafAndMute(newState: VoiceState) {
 }
 
 export async function checkIfChannelEmptyAndDelete(oldState: VoiceState) {
-    if (! await VoiceChannelService.isPrivateChannel(oldState.channelId!)) {
+    if (!oldState.channel) {
         return;
     }
 
-    if (oldState.channel?.members.size) {
+    if (!await VoiceChannelService.isPrivateChannel(oldState.channelId!)) {
         return;
     }
 
-    await oldState.channel?.delete();
+    if (oldState.channel.members.size) {
+        return;
+    }
+
+    await oldState.channel.delete();
     await VoiceChannelService.deleteChannel(oldState.channelId!);
     return;
 }

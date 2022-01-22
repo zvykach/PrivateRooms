@@ -1,11 +1,21 @@
-import {IEvent} from '../interfaces/IEvent'
+import {IEvent} from '@/interfaces/IEvent'
 import {Permissions, VoiceState} from 'discord.js'
 import {GuildService} from "@/services/guild.service";
 import {channelCreationError, cooldownTime} from "@/utils/embeds.util";
 import {VoiceChannelService} from "@/services/voiceChannel.service";
 import {checkIfChannelEmptyAndDelete} from "@/utils/check.utils";
 
-const creationCooldown = new Map<string, number>();
+function setNewTimer(key: string, msTime: number) {
+    return setTimeout(() => {
+        creationCooldown.delete(key);
+    }, msTime);
+}
+
+const creationCooldown = new Map<string, IUserCooldown>();
+interface IUserCooldown {
+    until: number,
+    timer: NodeJS.Timeout
+}
 
 const event: IEvent<"joinedPrivateRoomCreation"> = {
     name: "joinedPrivateRoomCreation",
@@ -15,41 +25,51 @@ const event: IEvent<"joinedPrivateRoomCreation"> = {
         }
 
         const cooldownKey = `${newState.guild.id}:${newState.id}`;
-        if (creationCooldown.has(cooldownKey)) {
-            const cooldown = await GuildService.getCooldownTime(newState.guild.id);
 
-            if (!cooldown) {
-                await newState.member?.send({embeds:[channelCreationError]});
-                await newState.disconnect("Error");
-                return;
-            }
+        let userCooldown = creationCooldown.get(cooldownKey);
+        const now = Date.now();
 
-            const time = creationCooldown.get(cooldownKey)! + cooldown * 1000;
-            const now = Date.now();
-
-            if ( time > now) {
-                await newState.member?.send({embeds:[cooldownTime(((time - now) / 1000).toString())]});
-                await newState.disconnect("Cooldown");
-                return;
-            }
-        }
-
-        creationCooldown.set(cooldownKey, Date.now());
-        const createPrivateRoomChannelId = await GuildService.getCreatePrivateChannelId(newState.guild.id);
-        if (!createPrivateRoomChannelId) {
-            await newState.member?.send({embeds:[channelCreationError]});
+        if (userCooldown) {
+            await newState.member?.send({embeds:[cooldownTime(((userCooldown.until - now) / 1000).toString())]});
+            await newState.disconnect("Cooldown");
             return;
         }
 
-        const parentId = newState.guild.channels.cache.find(channel => channel.id === createPrivateRoomChannelId)?.parentId
-        if (!parentId) {
+        let guildCooldown = await GuildService.getCooldownTime(newState.guild.id);
+        if (!guildCooldown) {
             await newState.member?.send({embeds:[channelCreationError]});
+            await newState.disconnect("Error");
             return;
         }
+        guildCooldown *= 1000;
+
+        userCooldown = {
+            until: now + guildCooldown,
+            timer: setNewTimer(cooldownKey, guildCooldown)
+        }
+        creationCooldown.set(cooldownKey, userCooldown);
+
+        // const createPrivateRoomChannelId = await GuildService.getCreatePrivateChannelId(newState.guild.id);
+        // if (!createPrivateRoomChannelId) {
+        //     await newState.member?.send({embeds:[channelCreationError]});
+        //     return;
+        // }
+
+        // const parentId = newState.guild.channels.cache.find(channel => channel.id === createPrivateRoomChannelId)?.parentId
+        // if (!parentId) {
+        //     await newState.member?.send({embeds:[channelCreationError]});
+        //     return;
+        // }
 
         const name = newState.member?.nickname
             ?? newState.member?.user.username
             ?? 'Someone';
+
+        const parentId = newState.channel!.parentId;
+        if (!parentId) {
+            await newState.member?.send({embeds:[channelCreationError]});
+            return;
+        }
 
         const channel = await newState.guild.channels.create(name+'\'s channel', {
             type: 'GUILD_VOICE',

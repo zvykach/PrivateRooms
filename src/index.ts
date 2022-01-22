@@ -2,7 +2,6 @@ import { Client, VoiceState } from "discord.js";
 import { IEvent } from './interfaces/IEvent';
 import config from '../config'
 import mongoose from 'mongoose';
-import fs from 'fs';
 import {GuildService} from "@/services/guild.service";
 
 // import readline from 'readline';
@@ -66,7 +65,7 @@ class PrivateRooms {
             return;
         }
         // ChangedVoice
-        if (oldState.channel !== newState.channel) {
+        if (oldState.channelId !== newState.channelId) {
             this.client.emit("changedVoice", oldState, newState);
             console.log("Changed");
             return;
