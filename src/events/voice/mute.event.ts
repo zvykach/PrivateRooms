@@ -2,14 +2,11 @@ import {IEvent} from "@/interfaces/IEvent";
 import {GuildService} from "@/services/guild.service";
 import {VoiceChannelService} from "@/services/voiceChannel.service";
 import {VoiceState} from "discord.js";
-import {VoiceChannelModel} from "@/models/voiceChannel.model";
-import {IUser} from "@/interfaces/IUser";
 
 const event: IEvent<"mutedInVoice"> = {
     name: "mutedInVoice",
     run: async (oldState: VoiceState, newState: VoiceState) => {
         if (await GuildService.isPermanentlyMuted(newState.guild.id, newState.id)) {
-            await newState.setMute(true);
             return;
         }
 
@@ -35,12 +32,7 @@ const event: IEvent<"mutedInVoice"> = {
             return;
         }
 
-        const toPush: IUser = {
-            who: newState.id,
-            by: entry.executor?.id
-        }
-
-        await VoiceChannelModel.findOneAndUpdate({channelId: newState.channelId!},{ $push: {mutedUsers: toPush}});
+        await VoiceChannelService.addMutedInChannel(newState.channelId!, newState.id, entry.executor?.id);
     }
 }
 

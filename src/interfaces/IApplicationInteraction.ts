@@ -1,4 +1,4 @@
-import { ApplicationCommandPermissionData, ApplicationCommandType, ChatInputApplicationCommandData, CommandInteraction, ContextMenuInteraction, MessageApplicationCommandData, UserApplicationCommandData} from 'discord.js';
+import { ApplicationCommandPermissionData, ChatInputApplicationCommandData, CommandInteraction, ContextMenuInteraction, MessageApplicationCommandData, UserApplicationCommandData} from 'discord.js';
 import { ApplicationCommandTypes } from 'discord.js/typings/enums';
 
 export type TApplicationInteraction =
@@ -9,7 +9,6 @@ export type TApplicationInteraction =
 export interface IApplicationInteraction {
     permissions?: ApplicationCommandPermissionData[];
     id?: string;
-    // moduleName?: string;
     run: (interaction: any) => Promise<void>;
 }
 

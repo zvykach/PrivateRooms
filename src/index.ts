@@ -1,8 +1,9 @@
-import { Client, VoiceState } from "discord.js";
+import {Client, Interaction, Message, VoiceState} from "discord.js";
 import { IEvent } from './interfaces/IEvent';
 import config from '../config'
 import mongoose from 'mongoose';
 import {GuildService} from "@/services/guild.service";
+import {IChatInputApplicationInteraction} from "@/interfaces/IApplicationInteraction";
 
 // import readline from 'readline';
 // const rl = readline.createInterface({
@@ -12,6 +13,7 @@ import {GuildService} from "@/services/guild.service";
 
 class PrivateRooms {
     private readonly client: Client;
+    private readonly slashInteractions: Map<string, IChatInputApplicationInteraction> = new Map();
 
     constructor(client: Client) {
         this.client = client;
@@ -21,19 +23,39 @@ class PrivateRooms {
 
         this.loadEvents();
         this.bindCustom();
+
+        this.client.on("ready", () => {
+            this.loadInteractions();
+        })
+    }
+
+    private async loadInteractions() {
+        const importedL: IChatInputApplicationInteraction[] = [];
+        importedL.push((await import('./interactions/mute.command')).default);
+        importedL.push((await import('./interactions/unmute.command')).default);
+        importedL.push((await import('./interactions/deaf.command')).default);
+        importedL.push((await import('./interactions/undeaf.command')).default);
+
+        for (const imported of importedL) {
+            if (imported.permissions) imported.defaultPermission = false;
+            this.slashInteractions.set(imported.name, imported);
+        }
+
+        const guild = await this.client.guilds.fetch("686257819913158659");
+        await guild.commands.set(importedL).catch(console.error);
     }
 
     private async loadEvents() {
         const importedL: IEvent<any>[] = [];
-        importedL.push((await import('./events/sentInitMessage.event')).default);
-        importedL.push((await import('./events/joinedPrivateRoomCreation.event')).default);
-        importedL.push((await import('./events/joinVoice.event')).default);
-        importedL.push((await import('./events/leaveVoice.event')).default);
-        importedL.push((await import('./events/changedVoice.event')).default);
-        importedL.push((await import('./events/mute.event')).default);
-        importedL.push((await import('./events/unMute.event')).default);
-        importedL.push((await import('./events/deaf.event')).default);
-        importedL.push((await import('./events/unDeaf.event')).default);
+        importedL.push((await import('./events/message/sentInitMessage.event')).default);
+        importedL.push((await import('./events/voice/joinedPrivateRoomCreation.event')).default);
+        importedL.push((await import('./events/voice/joinVoice.event')).default);
+        importedL.push((await import('./events/voice/leaveVoice.event')).default);
+        importedL.push((await import('./events/voice/changedVoice.event')).default);
+        importedL.push((await import('./events/voice/mute.event')).default);
+        importedL.push((await import('./events/voice/unMute.event')).default);
+        importedL.push((await import('./events/voice/deaf.event')).default);
+        importedL.push((await import('./events/voice/unDeaf.event')).default);
 
         for (const imported of importedL) {
             if (imported.once) this.client.once(imported.name, imported.run);
@@ -42,7 +64,32 @@ class PrivateRooms {
     }
 
     private bindCustom() {
-        this.client.on("voiceStateUpdate", (oldState: VoiceState, newState: VoiceState) => this.customVoiceState(oldState, newState))
+        this.client.on("voiceStateUpdate", this.customVoiceState);
+        this.client.on("messageCreate", this.guildChatCommandsHandler);
+        this.client.on("interactionCreate", this.guildInteractionCommandHendler)
+    }
+
+    private async guildChatCommandsHandler(message: Message) {
+        if (!message.inGuild()) return;
+
+        const guildPrefix = await GuildService.getGuildPrefix(message.guildId!);
+        if (!guildPrefix) return;
+
+        const [commandAll, ...args] = message.content.replace(/\s+/g,' ').trim().split(' ');
+
+        if (!commandAll.startsWith(guildPrefix)) return;
+        const command = commandAll.slice(0, guildPrefix.length);
+
+        this.client.emit("guildChatCommand", message, command, args);
+    }
+
+    private async guildInteractionCommandHendler(interaction: Interaction) {
+        if (!interaction.isCommand()) return;
+
+        const command = this.slashInteractions.get(interaction.commandName);
+        if (!command) return;
+
+        command.run(interaction);
     }
 
     private async customVoiceState(oldState: VoiceState, newState: VoiceState) {

@@ -1,5 +1,6 @@
-import { VoiceChannelModel, IVoiceChannel } from '../models/voiceChannel.model';
+import { VoiceChannelModel, IVoiceChannel } from '@/models/voiceChannel.model';
 import { Document, Types } from 'mongoose';
+import {IUser} from "@/interfaces/IUser";
 
 export type TVoiceChannelResponse = (Document<any, any, IVoiceChannel> & IVoiceChannel & {_id: Types.ObjectId}) | null;
 
@@ -29,5 +30,31 @@ export class VoiceChannelService {
 
     public static async deleteChannel(channelId: string) {
         await VoiceChannelModel.findOneAndDelete({ channelId });
+    }
+
+    public static async addMutedInChannel(channelId: string, who: string, by: string) {
+        const toPush: IUser = {
+            who,
+            by
+        }
+
+        await VoiceChannelModel.findOneAndUpdate({channelId}, {$push: {mutedUsers: toPush}});
+    }
+
+    public static async removeMutedInChannel(channelId: string, who: string) {
+        await VoiceChannelModel.findOneAndUpdate({channelId},{$pull: {mutedUsers: {who}}});
+    }
+
+    public static async addDeafedInChannel(channelId: string, who: string, by: string) {
+        const toPush: IUser = {
+            who,
+            by
+        }
+
+        await VoiceChannelModel.findOneAndUpdate({channelId},{ $push: {deafedUsers: toPush}});
+    }
+
+    public static async removeDeafedInChannel(channelId: string, who: string) {
+        await VoiceChannelModel.findOneAndUpdate({channelId},{$pull: {deafedUsers: {who}}});
     }
 }

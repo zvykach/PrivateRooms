@@ -1,4 +1,4 @@
-import { IEvent } from '../interfaces/IEvent'
+import { IEvent } from '@/interfaces/IEvent'
 import { VoiceState } from 'discord.js'
 import { checkUserDeafAndMute } from "@/utils/check.utils";
 

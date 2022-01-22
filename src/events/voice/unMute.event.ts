@@ -2,8 +2,6 @@ import {IEvent} from "@/interfaces/IEvent";
 import {GuildService} from "@/services/guild.service";
 import {VoiceChannelService} from "@/services/voiceChannel.service";
 import {VoiceState} from "discord.js";
-import {VoiceChannelModel} from "@/models/voiceChannel.model";
-import {IUser} from "@/interfaces/IUser";
 
 const event: IEvent<"unMutedInVoice"> = {
     name: "unMutedInVoice",
@@ -30,7 +28,7 @@ const event: IEvent<"unMutedInVoice"> = {
             return;
         }
 
-        await VoiceChannelModel.findOneAndUpdate({channelId: newState.channelId!},{$pull: {mutedUsers: {who: newState.id}}});
+        await VoiceChannelService.removeMutedInChannel(newState.channelId!, newState.id);
     }
 }
 

@@ -2,11 +2,9 @@ import {IEvent} from "@/interfaces/IEvent";
 import {GuildService} from "@/services/guild.service";
 import {VoiceChannelService} from "@/services/voiceChannel.service";
 import {VoiceState} from "discord.js";
-import {VoiceChannelModel} from "@/models/voiceChannel.model";
-import {IUser} from "@/interfaces/IUser";
 
-const event: IEvent<"deafedInVoice"> = {
-    name: "deafedInVoice",
+const event: IEvent<"unDeafedInVoice"> = {
+    name: "unDeafedInVoice",
     run: async (oldState: VoiceState, newState: VoiceState) => {
         if (await GuildService.isPermanentlyDeafed(newState.guild.id, newState.id)) {
             await newState.setDeaf(true);
@@ -20,27 +18,17 @@ const event: IEvent<"deafedInVoice"> = {
         const audit = await newState.guild.fetchAuditLogs({type:24, limit:1});
         const entry = audit.entries.first();
 
-        if (!(entry && entry.executor && entry.target)) {
+        if (!(entry && entry.executor)) {
             return;
         }
 
-        const isDeaf = entry.changes?.find(change => change.key === 'deaf' && change.new === true);
+        const isDeaf = entry.changes?.find(change => change.key === 'deaf' && change.new === false);
 
         if (!isDeaf) {
             return;
         }
 
-        if (await VoiceChannelService.isChannelOwner(newState.channelId!, newState.id)) {
-            await newState.setDeaf(false);
-            return;
-        }
-
-        const toPush: IUser = {
-            who: newState.id,
-            by: entry.executor?.id
-        }
-
-        await VoiceChannelModel.findOneAndUpdate({channelId: newState.channelId!},{ $push: {deafedUsers: toPush}});
+        await VoiceChannelService.removeDeafedInChannel(newState.channelId!, newState.id);
     }
 }
 

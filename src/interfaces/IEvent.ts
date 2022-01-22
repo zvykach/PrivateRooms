@@ -1,4 +1,4 @@
-import {ClientEvents, VoiceState} from "discord.js";
+import {ClientEvents, Message, VoiceState} from "discord.js";
 
 type Run <K extends keyof ExtendedClientEvents> = (...args: ExtendedClientEvents[K]) => Promise<any>
 
@@ -11,6 +11,7 @@ interface ExtendedClientEvents extends ClientEvents {
     deafedInVoice: [oldState: VoiceState, newState: VoiceState]
     unMutedInVoice: [oldState: VoiceState, newState: VoiceState]
     unDeafedInVoice: [oldState: VoiceState, newState: VoiceState]
+    guildChatCommand: [message: Message, command: string, ...args: string[]]
 }
 
 export interface IEvent<K extends keyof ExtendedClientEvents> {
