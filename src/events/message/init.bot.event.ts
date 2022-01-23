@@ -1,11 +1,8 @@
 import {IEvent} from '@/interfaces/IEvent'
 import {Message} from 'discord.js'
 import {GuildService} from '@/services/guild.service';
-import config from "../../../config";
 import {checkCreationchannel, deleteMessage} from "@/utils/discord.utils";
-
-const MINIMUM_COOLDOWN = config.MINIMUM_COOLDOWN;
-const MAXIMUM_COOLDOWN = config.MAXIMUM_COOLDOWN;
+import {PrivateRooms} from "@/index";
 
 const event: IEvent<"messageCreate"> = {
     name: "messageCreate",
@@ -20,7 +17,7 @@ const event: IEvent<"messageCreate"> = {
 
         const [command, creationChannelId, prefix, cooldown, ...extra] = message.content.replace(/\s+/g,' ').trim().split(' ');
 
-        if (command !== 'private#init') {
+        if (command !== PrivateRooms.instance.botCommandsPrefix+'init') {
             return;
         }
 
@@ -52,14 +49,14 @@ const event: IEvent<"messageCreate"> = {
         }
 
 
-        if (!(+cooldown >= MINIMUM_COOLDOWN)) {
-            const reply = await message.reply(`Cooldown is less than minimal (${MINIMUM_COOLDOWN})`);
+        if (!(+cooldown >= PrivateRooms.instance.minCooldownTime)) {
+            const reply = await message.reply(`Cooldown is less than minimal (${PrivateRooms.instance.minCooldownTime})`);
             deleteMessage(reply, 10000);
             return;
         }
 
-        if (!(+cooldown <= MAXIMUM_COOLDOWN)) {
-            const reply = await message.reply(`Cooldown is more than maximum (${MAXIMUM_COOLDOWN})`);
+        if (!(+cooldown <= PrivateRooms.instance.maxCooldownTime)) {
+            const reply = await message.reply(`Cooldown is more than maximum (${PrivateRooms.instance.maxCooldownTime})`);
             deleteMessage(reply, 10000);
             return;
         }

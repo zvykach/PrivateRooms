@@ -1,5 +1,4 @@
 import {IChatInputApplicationInteraction} from "@/interfaces/IApplicationInteraction";
-import {ApplicationCommandOptionTypes} from "discord.js/typings/enums";
 import {GuildService} from "@/services/guild.service";
 import {GuildMember} from "discord.js";
 
@@ -11,7 +10,7 @@ const interaction: IChatInputApplicationInteraction = {
         {
             name: 'user',
             description: 'User to undeaf',
-            type: ApplicationCommandOptionTypes.USER,
+            type: 'USER',
             required: true,
         }
     ],
