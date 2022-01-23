@@ -9,7 +9,7 @@ const event: IEvent<"guildChatCommand"> = {
         if (!message.member?.permissions.has('ADMINISTRATOR')) return;
         if (command !== 'creationchannel') return;
 
-        deleteMessage(message, 7000);
+        deleteMessage(message, 10000);
         if (args.length != 1) {
             const reply = await message.reply(`Please, use \` ${prefix}creationchannel <new prefix> \``);
             deleteMessage(reply, 10000);

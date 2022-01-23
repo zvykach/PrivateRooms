@@ -35,6 +35,10 @@ export class GuildService {
         return resp?.cooldown;
     }
 
+    public static async setCooldown(guildId: string, cooldown: number) {
+        await GuildModel.updateOne({guildId}, {cooldown});
+    }
+
     public static async isGuildModerator(guildId: string, roleId: string): Promise<boolean> {
         const resp = await GuildModel.findOne({guildId});
 

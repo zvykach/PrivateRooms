@@ -9,13 +9,12 @@ const event: IEvent<"guildChatCommand"> = {
         if (!message.member?.permissions.has('ADMINISTRATOR')) return;
         if (command !== 'prefix') return;
 
-        deleteMessage(message, 7000);
+        deleteMessage(message, 10000);
         if (args.length != 1) {
             const reply = await message.reply(`Please, use \` ${prefix}prefix <new prefix> \``);
             deleteMessage(reply, 10000);
             return;
         }
-        console.log(args[0])
 
         await GuildService.setGuildPrefix(message.guildId!, args[0]);
         const reply = await message.reply(`Prefix updated!`);

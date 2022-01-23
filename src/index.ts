@@ -93,7 +93,7 @@ class PrivateRooms {
         const command = this.slashInteractions.get(interaction.commandName);
         if (!command) return;
 
-        command.run(interaction);
+        await command.run(interaction);
     }
 
     private async customVoiceState(oldState: VoiceState, newState: VoiceState) {

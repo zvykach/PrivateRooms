@@ -9,7 +9,7 @@ const event: IEvent<"guildChatCommand"> = {
         if (!message.member?.permissions.has('ADMINISTRATOR')) return;
         if (command !== 'moderators') return;
 
-        deleteMessage(message, 7000);
+        deleteMessage(message, 10000);
 
         if (args.length < 1 || args.length > 11 || !['add', 'remove', 'clear'].includes(args[0])) {
             const reply = await message.reply(`Please, use \` ${prefix}moderatorroles <add | remove | clear> <roleId 1> ...[roleId 10] \``);

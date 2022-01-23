@@ -24,13 +24,13 @@ const event: IEvent<"messageCreate"> = {
             return;
         }
 
+        deleteMessage(message, 10000);
+
         if (await GuildService.guildExits(message.guildId!)) {
             const reply = await message.reply("Guild has been already initialized");
             deleteMessage(reply, 10000);
             return;
         }
-
-        deleteMessage(message, 7000);
 
         if (!creationChannelId) {
             const reply = await message.reply("Please, use \` private#init <ChannelId> [prefix] [cooldown (sec)] \`");
