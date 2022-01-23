@@ -25,16 +25,16 @@
 
     "skipLibCheck": true,
     "moduleResolution": "node",
-    "noImplicitAny": true
+    "noImplicitAny": true,
     
     //"experimentalDecorators": true,
     //"emitDecoratorMetadata": true,
     //"forceConsistentCasingInFileNames": true,
     //"noEmit": false,
 
-    // "declaration": true,
-    // "declarationMap": true,
-    // "sourceMap": true,
+//     "declaration": true,
+//     "declarationMap": true,
+//     "sourceMap": true,
   },
   // "include": [
   //   "src/**/*.ts"

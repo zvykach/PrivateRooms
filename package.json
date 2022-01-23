@@ -7,8 +7,8 @@
   "scripts": {
     "start": "nodemon --config nodemon.json --ext ts --ignore 'src/config/*.json' -r tsconfig-paths/register ./main.ts",
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-    "bundle": "esbuild src/index.ts --bundle --platform=node --target=node16.7 --outfile=bundle/out.js --external:discord.js --external:mongoose",
-    "debug": "node --inspect -r ts-node/register -r tsconfig-paths/register ./main.ts"
+    "bundle": "esbuild src/index.ts --bundle --platform=node --target=node16.7 --outfile=bundle/privaterooms-%npm_package_version%.js --external:discord.js --external:mongoose",
+    "inspect": "node --inspect -r ts-node/register -r tsconfig-paths/register ./main.ts"
   },
   "author": "zvykach",
   "license": "GPL-3.0-or-later",

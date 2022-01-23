@@ -12,7 +12,7 @@ const event: IEvent<"guildChatCommand"> = {
         deleteMessage(message, 10000);
 
         if (args.length < 1 || args.length > 11 || !['add', 'remove', 'clear'].includes(args[0])) {
-            const reply = await message.reply(`Please, use \` ${prefix}moderatorroles <add | remove | clear> <roleId 1> ...[roleId 10] \``);
+            const reply = await message.reply(`Please, use \` ${prefix}moderators <add|remove|clear> [roleId ..10] \``);
             deleteMessage(reply, 10000);
             return;
         }
