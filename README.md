@@ -71,9 +71,8 @@ Don't forget to preinstall Typescript and NodeJs first.
 Before starting, also create `config.ts` file and fill it as indicated in `config.example.ts`
 
 ### About script
-####Commands
 🔸 Administrator only 🔹 Moderator only
-
+####Commands
 - `$help` - show all commands
 - `$moderators add <roleID> ..[roleID]` - add role to moderators list 🔸
 - `$moderators remove <roleID> ..[roleID]` - remove role from moderators list 🔸
