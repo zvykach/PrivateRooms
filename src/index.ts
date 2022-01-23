@@ -47,7 +47,6 @@ class PrivateRooms {
 
     private async loadEvents() {
         const importedL: IEvent<any>[] = [];
-        importedL.push((await import('./events/message/sentInitMessage.event')).default);
         importedL.push((await import('./events/voice/joinedPrivateRoomCreation.event')).default);
         importedL.push((await import('./events/voice/joinVoice.event')).default);
         importedL.push((await import('./events/voice/leaveVoice.event')).default);
@@ -57,6 +56,11 @@ class PrivateRooms {
         importedL.push((await import('./events/voice/deaf.event')).default);
         importedL.push((await import('./events/voice/unDeaf.event')).default);
 
+        importedL.push((await import('./events/message/sentInitMessage.event')).default);
+        importedL.push((await import('./events/message/prefix.change.event')).default);
+        importedL.push((await import('./events/message/creationchannel.change.event')).default);
+        importedL.push((await import('./events/message/moderators.event')).default);
+
         for (const imported of importedL) {
             if (imported.once) this.client.once(imported.name, imported.run);
             else this.client.on(imported.name, imported.run);
@@ -64,9 +68,9 @@ class PrivateRooms {
     }
 
     private bindCustom() {
-        this.client.on("voiceStateUpdate", this.customVoiceState);
-        this.client.on("messageCreate", this.guildChatCommandsHandler);
-        this.client.on("interactionCreate", this.guildInteractionCommandHendler)
+        this.client.on("voiceStateUpdate", (oldState, newState) => this.customVoiceState(oldState, newState));
+        this.client.on("messageCreate", (message) => this.guildChatCommandsHandler(message));
+        this.client.on("interactionCreate", (interaction) => this.guildInteractionCommandHendler(interaction))
     }
 
     private async guildChatCommandsHandler(message: Message) {
@@ -78,9 +82,9 @@ class PrivateRooms {
         const [commandAll, ...args] = message.content.replace(/\s+/g,' ').trim().split(' ');
 
         if (!commandAll.startsWith(guildPrefix)) return;
-        const command = commandAll.slice(0, guildPrefix.length);
+        const command = commandAll.slice(guildPrefix.length);
 
-        this.client.emit("guildChatCommand", message, command, args);
+        this.client.emit("guildChatCommand", message, guildPrefix, command, ...args);
     }
 
     private async guildInteractionCommandHendler(interaction: Interaction) {

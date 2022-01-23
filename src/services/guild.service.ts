@@ -26,6 +26,10 @@ export class GuildService {
         return resp?.prefix;
     }
 
+    public static async setGuildPrefix(guildId: string, newPrefix: string) {
+        await GuildModel.updateOne({guildId}, {prefix: newPrefix});
+    }
+
     public static async getCooldownTime(guildId: string) {
         const resp = await GuildModel.findOne({guildId});
         return resp?.cooldown;
@@ -35,6 +39,18 @@ export class GuildService {
         const resp = await GuildModel.findOne({guildId});
 
         return resp ? resp.moderatorRoleIds.includes(roleId) : false;
+    }
+
+    public static async addGuildModerator(guildId: string, ...roleIds: string[]) {
+        await GuildModel.updateOne({guildId}, {$push: {moderatorRoleIds: {$each: roleIds}}});
+    }
+
+    public static async removeGuildModerator(guildId: string, ...roleIds: string[]) {
+        await GuildModel.updateOne({guildId}, {$pullAll: {moderatorRoleIds: roleIds}});
+    }
+
+    public static async clearGuildModerator(guildId: string) {
+        await GuildModel.updateOne({guildId}, {moderatorRoleIds: []});
     }
 
     public static async isPermanentlyMuted(guildId: string, userId: string) {

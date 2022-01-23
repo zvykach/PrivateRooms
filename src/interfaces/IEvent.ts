@@ -11,7 +11,7 @@ interface ExtendedClientEvents extends ClientEvents {
     deafedInVoice: [oldState: VoiceState, newState: VoiceState]
     unMutedInVoice: [oldState: VoiceState, newState: VoiceState]
     unDeafedInVoice: [oldState: VoiceState, newState: VoiceState]
-    guildChatCommand: [message: Message, command: string, ...args: string[]]
+    guildChatCommand: [message: Message, prefix: string, command: string, ...args: string[]]
 }
 
 export interface IEvent<K extends keyof ExtendedClientEvents> {
